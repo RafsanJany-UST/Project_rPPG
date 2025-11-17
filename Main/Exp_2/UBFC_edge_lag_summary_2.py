@@ -78,10 +78,12 @@ def main():
 if __name__ == "__main__":
     main()
 
+
+
 '''
 | Label          | Meaning                               | Action                              |
 | -------------- | ------------------------------------- | ----------------------------------- |
 | TRIM           | Lag small → alignment OK              | Just trim remaining frames          |
 | FPS_ADJUST     | Lag large AND matches leftover frames | Adjust FPS (drift fix)              |
 | UNCERTAIN      | Lag large but leftover frames ≈ 0     | Hard case → needs further study     |
-'''
+''' 

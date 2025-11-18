@@ -13,7 +13,8 @@ from Main.Signal_Processing_Engine.roi_central import CentralRoiExtractor
 from Main.Signal_Processing_Engine.rgb_extractor import extract_rgb_timeseries
 from Main.rPPG_Algorithm_Cell import rppg_chrom, bandpass_zero_phase
 
-UBFC_ROOT = Path(r"D:\Data\UBFC\Dataset_3")
+#UBFC_ROOT = Path(r"D:\Data\UBFC\Dataset_3")
+UBFC_ROOT = Path("/media/data/rPPG/rPPG_Data/UBFC_rPPG")
 SEQ_ID = "vid_17"
 
 WIN_LEN = 8.0

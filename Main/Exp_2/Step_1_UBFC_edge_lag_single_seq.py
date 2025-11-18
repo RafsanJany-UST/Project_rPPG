@@ -14,7 +14,8 @@ from Main.rPPG_Algorithm_Cell import rppg_chrom
 from Main.rPPG_Algorithm_Cell import bandpass_zero_phase
 
 
-UBFC_ROOT = Path(r"D:\Data\UBFC\Dataset_3")
+#UBFC_ROOT = Path(r"D:\Data\UBFC\Dataset_3")
+UBFC_ROOT = Path("/media/data/rPPG/rPPG_Data/UBFC_rPPG")
 SEQ_ID = "vid_1"   # we can change this later
 
 WIN_LEN_SEC = 8.0

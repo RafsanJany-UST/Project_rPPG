@@ -1,27 +1,34 @@
-# Main/Exp_2/Step_2_UBFC_FPS_correction_test
+# Main/Exp_2/PURE_FPS_correction_test_Step_2.py
 
-from pathlib import Path
 import numpy as np
 
-from Main.Data_Read_Engine.ubfc_alignment import (
-    load_ubfc_gt_and_fix,
-    ubfc_align_ppg_to_frame_times,
+from Main.Data_Read_Engine import (
+    load_pure_json,
+    extract_streams_from_pure_json,
+    pure_align_ppg_to_frame_times,
 )
 
-from Main.Signal_Processing_Engine.ubfc_dataset import UBFCFrameSource
+from Main.Signal_Processing_Engine.pure_dataset import PUREFrameSource
 from Main.Signal_Processing_Engine.roi_central import CentralRoiExtractor
 from Main.Signal_Processing_Engine.rgb_extractor import extract_rgb_timeseries
 from Main.rPPG_Algorithm_Cell import rppg_chrom, bandpass_zero_phase
 
-UBFC_ROOT = Path(r"D:\Data\UBFC\Dataset_3")
-#UBFC_ROOT = Path("/media/data/rPPG/rPPG_Data/UBFC_rPPG")
-SEQ_ID = "vid_17"
+
+SEQ_ID = "01-01"   # we can change this later
 
 WIN_LEN = 8.0
 PADDING = 1.0
 ROI_FRAC = 0.5
 
-def compute_lag_in_window(source, t_ppg_s, ppg_wave, t_start, t_end, fps_override=None):
+
+def compute_lag_in_window(
+    source: PUREFrameSource,
+    t_ppg_s: np.ndarray,
+    ppg_wave: np.ndarray,
+    t_start: float,
+    t_end: float,
+    fps_override: float | None = None,
+):
     """
     We compute CHROM–GT lag for a single window.
 
@@ -48,14 +55,21 @@ def compute_lag_in_window(source, t_ppg_s, ppg_wave, t_start, t_end, fps_overrid
         )
 
         if len(t_frame_win) < 20:
-            raise RuntimeError(f"Too few frames in [{t_start:.3f}, {t_end:.3f}]")
+            raise RuntimeError(
+                f"Too few frames in [{t_start:.3f}, {t_end:.3f}] "
+                f"(got {len(t_frame_win)})"
+            )
 
         # 2) Frame dt and FPS
         dt = float(np.mean(np.diff(t_frame_win)))
         fps_est = 1.0 / dt
 
-        # 3) Align GT to these frame times
-        ppg_at_frames = ubfc_align_ppg_to_frame_times(t_ppg_s, ppg_wave, t_frame_win)
+        # 3) Align GT PPG to these frame times
+        ppg_at_frames = pure_align_ppg_to_frame_times(
+            t_ppg_s=t_ppg_s,
+            wave=ppg_wave,
+            t_vid_s=t_frame_win,
+        )
 
         # 4) Filter both signals
         ppg_f = bandpass_zero_phase(ppg_at_frames, fs=fps_est)
@@ -72,8 +86,8 @@ def compute_lag_in_window(source, t_ppg_s, ppg_wave, t_start, t_end, fps_overrid
         max_lag_samples = int(min(2.0 / dt, T - 1))
         mask = (lags >= -max_lag_samples) & (lags <= max_lag_samples)
 
-        best = np.argmax(np.abs(corr[mask]))
-        lag_samples = lags[mask][best]
+        best = int(np.argmax(np.abs(corr[mask])))
+        lag_samples = int(lags[mask][best])
         lag_sec = lag_samples * dt
         lag_frames = lag_sec * fps_est
 
@@ -85,22 +99,33 @@ def compute_lag_in_window(source, t_ppg_s, ppg_wave, t_start, t_end, fps_overrid
 
 
 def main():
-    print(f"\n=== FPS Correction Test for {SEQ_ID} ===")
+    print(f"\n=== FPS Correction Test for PURE {SEQ_ID} ===")
 
-    # --- load GT ---
-    gt_file = next((UBFC_ROOT / SEQ_ID).glob("*.txt"))
-    t_ppg_s, ppg_wave, _ = load_ubfc_gt_and_fix(gt_file)
+    # --- load JSON GT and video timestamps ---
+    data = load_pure_json(SEQ_ID)
+    t_ppg_ns, wave, t_vid_ns_json, hr_dev = extract_streams_from_pure_json(data)
 
-    # --- load video ---
-    vid_file = next((UBFC_ROOT / SEQ_ID).glob("*.avi"))
-    source = UBFCFrameSource(vid_file)
-    t_all = source.t_frame_s
-    fps_original = source.fps
+    # We use video start (from JSON) as time origin for PPG
+    t0_ns = t_vid_ns_json[0]
+    t_ppg_s = (t_ppg_ns - t0_ns) * 1e-9
+
+    # --- build frame source from PURE images ---
+    source = PUREFrameSource(SEQ_ID)
+    t_all = source.t_frame_s   # already relative to first frame in seconds
     n_frames = len(t_all)
 
-    # --- overlap ---
-    overlap_start = max(t_ppg_s[0], t_all[0])
-    overlap_end = min(t_ppg_s[-1], t_all[-1])
+    # "Original" FPS: estimated from image timestamps
+    if len(t_all) < 2:
+        raise RuntimeError(f"Not enough frames for FPS estimation in {SEQ_ID}")
+    dt_all = np.diff(t_all)
+    fps_original = 1.0 / float(np.mean(dt_all))
+
+    # --- overlap between PPG and frames ---
+    overlap_start = max(float(t_ppg_s[0]), float(t_all[0]))
+    overlap_end = min(float(t_ppg_s[-1]), float(t_all[-1]))
+
+    if overlap_end - overlap_start < 2 * WIN_LEN + 2 * PADDING:
+        raise RuntimeError("Not enough overlap for two 8 s windows with padding.")
 
     t_start_start = overlap_start + PADDING
     t_end_start = t_start_start + WIN_LEN
@@ -108,33 +133,36 @@ def main():
     t_start_end = overlap_end - PADDING - WIN_LEN
     t_end_end = t_start_end + WIN_LEN
 
-    # --- compute corrected FPS ---
-    ppg_duration = t_ppg_s[-1] - t_ppg_s[0]
+    # --- compute "corrected" FPS from GT duration ---
+    ppg_duration = float(t_ppg_s[-1] - t_ppg_s[0])
+    if ppg_duration <= 0:
+        raise RuntimeError(f"Non-positive GT duration for {SEQ_ID}: {ppg_duration}")
+
     fps_corrected = n_frames / ppg_duration
 
-    print(f"Original FPS : {fps_original:.3f}")
-    print(f"Corrected FPS: {fps_corrected:.3f}\n")
+    print(f"Original FPS (from images): {fps_original:.3f}")
+    print(f"Corrected FPS (frames/GT):  {fps_corrected:.3f}\n")
 
-    print("Computing lags with original FPS...")
+    print("Computing lags with original FPS timeline...")
     lag_s_s, lag_f_s, _ = compute_lag_in_window(
-        source, t_ppg_s, ppg_wave, t_start_start, t_end_start
+        source, t_ppg_s, wave, t_start_start, t_end_start, fps_override=None
     )
     lag_s_e, lag_f_e, _ = compute_lag_in_window(
-        source, t_ppg_s, ppg_wave, t_start_end, t_end_end
+        source, t_ppg_s, wave, t_start_end, t_end_end, fps_override=None
     )
 
-    print("Computing lags with corrected FPS...")
+    print("Computing lags with corrected FPS timeline...")
     lag_s_s_c, lag_f_s_c, _ = compute_lag_in_window(
-        source, t_ppg_s, ppg_wave, t_start_start, t_end_start,
-        fps_override=fps_corrected
+        source, t_ppg_s, wave, t_start_start, t_end_start,
+        fps_override=fps_corrected,
     )
     lag_s_e_c, lag_f_e_c, _ = compute_lag_in_window(
-        source, t_ppg_s, ppg_wave, t_start_end, t_end_end,
-        fps_override=fps_corrected
+        source, t_ppg_s, wave, t_start_end, t_end_end,
+        fps_override=fps_corrected,
     )
 
     # --- print summary ---
-    print("\n=== Lag Comparison ===")
+    print("\n=== Lag Comparison (PURE) ===")
     print(f"Start lag original   : {lag_f_s:.2f} frames")
     print(f"End lag original     : {lag_f_e:.2f} frames")
     print(f"Δlag original        : {abs(lag_f_e - lag_f_s):.2f} frames\n")

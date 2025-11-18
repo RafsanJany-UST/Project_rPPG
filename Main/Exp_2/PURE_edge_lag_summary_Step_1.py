@@ -1,4 +1,4 @@
-# Main/Exp_2/PURE_edge_lag_summary.py
+# Main/Exp_2/PURE_edge_lag_summary_Step_1.py
 
 import os
 import glob

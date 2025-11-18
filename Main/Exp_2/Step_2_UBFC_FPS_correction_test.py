@@ -1,4 +1,4 @@
-# Main/Experiment_Cell/UBFC_FPS_correction_test.py
+# Main/Exp_2/Step_2_UBFC_FPS_correction_test
 
 from pathlib import Path
 import numpy as np

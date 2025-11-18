@@ -3,7 +3,7 @@
 from pathlib import Path
 import numpy as np
 
-from .UBFC_edge_lag_single_seq import (
+from .Do_Not_Run_UBFC_edge_lag_single_seq import (
     UBFC_ROOT,
     compute_edge_lags_for_sequence,
 )

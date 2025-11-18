@@ -1,9 +1,9 @@
-# Main/Experiment_Cell/UBFC_edge_lag_summary.py
+# Main/Exp_2/Step_1_UBFC_edge_lag_summary.py
 
 from pathlib import Path
 import numpy as np
 
-from .UBFC_edge_lag_single_seq_2 import (
+from .Step_1_UBFC_edge_lag_single_seq import (
     UBFC_ROOT,
     compute_edge_lags_for_sequence,
 )

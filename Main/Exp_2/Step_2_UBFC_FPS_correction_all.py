@@ -1,4 +1,4 @@
-# Main/Exp_2/Step_2_UBFC_FPS_correction_all.py
+# Main/Exp_2/Step_2_UBFC_FPS_correction_all
 
 from pathlib import Path
 import numpy as np

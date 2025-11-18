@@ -1,4 +1,4 @@
-# Main/Experiment_Cell/UBFC_edge_lag_single_seq.py
+# Main/Exp_2/Step_1_UBFC_edge_lag_single_seq.py
 
 from pathlib import Path
 import numpy as np

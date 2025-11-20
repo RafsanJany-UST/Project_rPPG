@@ -102,7 +102,6 @@ def prepare_full_signals(seq_id: str, root: Path):
 
     #roi = CentralRoiExtractor(frac=ROI_FRAC)
     roi = build_roi_extractor()
-
     t_frame_full, rgb_full = extract_rgb_timeseries(
         source=source,
         roi_extractor=roi,
@@ -163,7 +162,7 @@ def main():
         "--out",
         type=str,
         default="Figures/UBFC_VIZ_plotly",
-        help="Output directory for HTML figures.", 
+        help="Output directory for HTML figures.",
     )
     parser.add_argument(
         "--win_len",

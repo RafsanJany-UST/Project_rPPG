@@ -17,7 +17,7 @@ from pathlib import Path
 import numpy as np
 import cv2
 
-from .dataset_base import FrameSource
+from dataset_base import FrameSource
 
 
 class UBFCFrameSource(FrameSource):

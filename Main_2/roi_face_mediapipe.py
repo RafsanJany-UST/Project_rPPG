@@ -14,7 +14,7 @@ from typing import Tuple
 
 import numpy as np
 
-from .roi_base import RoiExtractor  # adjust import if using package
+from roi_base import RoiExtractor  # adjust import if using package
 
 try:
     import mediapipe as mp

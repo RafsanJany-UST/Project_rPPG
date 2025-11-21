@@ -4,7 +4,7 @@ Central rectangular ROI implementation.
 """
 
 import numpy as np
-from .roi_base import RoiExtractor  # adjust import if using package
+from roi_base import RoiExtractor  # adjust import if using package
 
 
 class CentralRoiExtractor(RoiExtractor):

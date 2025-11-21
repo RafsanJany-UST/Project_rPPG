@@ -3,8 +3,8 @@ from typing import Tuple
 import numpy as np
 import cv2
 
-from Main.datasets.base import FrameSource
-from Main.ROI_Engine.base import RoiExtractor
+from datasets_base import FrameSource
+from roi_engine_base import RoiExtractor
 
 def extract_rgb_timeseries(
     source: FrameSource,

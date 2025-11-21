@@ -11,7 +11,7 @@ from typing import Optional
 import numpy as np
 import cv2
 
-from .roi_base import RoiExtractor  # adjust import if using package
+from roi_base import RoiExtractor  # adjust import if using package
 
 
 class OpenCVFaceBoxRoi(RoiExtractor):

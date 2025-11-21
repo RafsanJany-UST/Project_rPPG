@@ -9,21 +9,21 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from .Plot_Me import make_window_plot_1, make_window_plot_2
-
-
-
-from Main.Data_Read_Engine.ubfc_alignment import (
+from plot_me import make_window_plot_1, make_window_plot_2, make_window_plot_with_pairs
+from ubfc_alignment import (
     load_ubfc_gt_and_fix,
     ubfc_align_ppg_to_frame_times,
 )
-from Main.Signal_Processing_Engine.ubfc_dataset import UBFCFrameSource
-from Main.Signal_Processing_Engine.roi_central import CentralRoiExtractor
-from Main.Signal_Processing_Engine.roi_central import CentralRoiExtractor
-from Main.Signal_Processing_Engine.roi_face_opencv import OpenCVFaceBoxRoi
-from Main.Signal_Processing_Engine.roi_face_mediapipe import MediaPipeFaceRegionsRoi
-from Main.Signal_Processing_Engine.rgb_extractor import extract_rgb_timeseries
-from Main.rPPG_Algorithm_Cell import rppg_chrom, bandpass_zero_phase
+
+from ubfc_dataset import UBFCFrameSource
+from roi_central import CentralRoiExtractor
+from roi_face_opencv import OpenCVFaceBoxRoi
+from roi_face_mediapipe import MediaPipeFaceRegionsRoi
+from rgb_extractor import extract_rgb_timeseries
+from rPPG_Algorithm_Cell import rppg_chrom, bandpass_zero_phase
+
+
+
 
 
 UBFC_ROOT = Path(r"D:\Data\UBFC\Dataset_3")
@@ -102,6 +102,7 @@ def prepare_full_signals(seq_id: str, root: Path):
 
     #roi = CentralRoiExtractor(frac=ROI_FRAC)
     roi = build_roi_extractor()
+
     t_frame_full, rgb_full = extract_rgb_timeseries(
         source=source,
         roi_extractor=roi,
@@ -149,7 +150,8 @@ def main():
     parser.add_argument(
         "--seq",
         type=str,
-        required=True,
+        #required=True,
+        default= 'vid_20',
         help="Sequence ID, for example vid_1, vid_15, vid_20.",
     )
     parser.add_argument(
@@ -162,7 +164,7 @@ def main():
         "--out",
         type=str,
         default="Figures/UBFC_VIZ_plotly",
-        help="Output directory for HTML figures.",
+        help="Output directory for HTML figures.", 
     )
     parser.add_argument(
         "--win_len",
@@ -211,8 +213,7 @@ def main():
         f"End window:   [{t_start_end:.3f}, {t_end_end:.3f}] s"
     )
 
-    # We build start-window visualization
-    make_window_plot_1(
+    make_window_plot_with_pairs(
         info,
         t_start=t_start_start,
         t_end=t_end_start,
@@ -221,8 +222,7 @@ def main():
         local_win_seconds=float(args.local_win),
     )
 
-    # We build end-window visualization
-    make_window_plot_1(
+    make_window_plot_with_pairs(
         info,
         t_start=t_start_end,
         t_end=t_end_end,
@@ -230,27 +230,6 @@ def main():
         out_dir=out_dir,
         local_win_seconds=float(args.local_win),
     )
-
-    # We build start-window visualization
-    make_window_plot_2(
-        info,
-        t_start=t_start_start,
-        t_end=t_end_start,
-        label="start",
-        out_dir=out_dir,
-        local_win_seconds=float(args.local_win),
-    )
-
-    # We build end-window visualization
-    make_window_plot_2(
-        info,
-        t_start=t_start_end,
-        t_end=t_end_end,
-        label="end",
-        out_dir=out_dir,
-        local_win_seconds=float(args.local_win),
-    )
-
 
 
     print("\nInteractive visualization complete.")

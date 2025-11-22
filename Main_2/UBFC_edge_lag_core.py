@@ -16,7 +16,8 @@ from rgb_extractor import extract_rgb_timeseries
 from rPPG_Algorithm_Cell import rppg_chrom, bandpass_zero_phase
 
 
-UBFC_ROOT = Path(r"D:\Data\UBFC\Dataset_3")
+#UBFC_ROOT = Path(r"D:\Data\UBFC\Dataset_3")
+UBFC_ROOT = Path("/media/data/rPPG/rPPG_Data/UBFC_rPPG")
 
 WIN_LEN_SEC = 8.0
 T_START_PADDING = 1.0   # we skip the first 1 s of overlap

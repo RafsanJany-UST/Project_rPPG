@@ -3,15 +3,24 @@
 from pathlib import Path
 import argparse
 
-# If your main file is named UBFC_sequence_viz_plotly.py, use this import:
-from .UBFC_seq_viz_1 import (
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
+
+from Main.VIZ.UBFC_seq_viz_1 import (
     prepare_full_signals,
     UBFC_ROOT,
     WIN_LEN,
     PADDING,
 )
 
-from .Plot_Me import make_window_plot_1, make_window_plot_2
+
+from Main.VIZ.Plot_Me import make_window_plot_1, make_window_plot_2
 
 
 def main():
@@ -26,13 +35,15 @@ def main():
     parser.add_argument(
         "--seq",
         type=str,
-        required=True,
+        required=False,
+        default="vid_15",
         help="Sequence ID, for example vid_1, vid_15, vid_20.",
     )
     parser.add_argument(
         "--win_idx",
         type=int,
-        required=True,
+        required=False,
+        default= 5,
         help=(
             "Window index (0-based). "
             "win_idx=0 → first window; "

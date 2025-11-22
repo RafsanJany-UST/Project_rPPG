@@ -9,8 +9,17 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-from .Plot_Me import make_window_plot_1, make_window_plot_2
 
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
+
+from Main.VIZ.Plot_Me import make_window_plot_1, make_window_plot_2
 
 
 from Main.Data_Read_Engine.ubfc_alignment import (
@@ -151,7 +160,8 @@ def main():
     parser.add_argument(
         "--seq",
         type=str,
-        required=True,
+        required=False,
+        default="vid_15",
         help="Sequence ID, for example vid_1, vid_15, vid_20.",
     )
     parser.add_argument(

@@ -3,6 +3,14 @@
 from pathlib import Path
 import numpy as np
 
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
 from Main.Data_Read_Engine.ubfc_alignment import (
     load_ubfc_gt_and_fix,
     ubfc_align_ppg_to_frame_times,

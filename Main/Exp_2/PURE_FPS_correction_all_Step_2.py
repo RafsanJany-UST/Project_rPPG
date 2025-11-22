@@ -1,5 +1,15 @@
 # Main/Exp_2/PURE_FPS_correction_all_Step_2.py
 
+
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
+
 from pathlib import Path
 import numpy as np
 

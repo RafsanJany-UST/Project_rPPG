@@ -22,6 +22,12 @@ Pipeline:
 
 No time shifting of signals; this step only analyses lag characteristics.
 """
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
 import matplotlib.pyplot as plt

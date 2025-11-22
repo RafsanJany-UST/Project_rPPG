@@ -16,6 +16,13 @@ Outputs:
     - Boxplots + violin plots of per-sequence mean lag (ms) for POS/CHROM
 """
 
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import os
 from pathlib import Path
 import csv
@@ -23,6 +30,7 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+
 
 from Main.Data_Read_Engine.ubfc_alignment import (
     load_ubfc_gt_and_fix,

@@ -16,6 +16,12 @@ This version uses the modular architecture:
 - Main.Data_Read_Engine for PURE I/O and alignment
 - Main.Signal_Processing_Engine for dataset/ROI/rPPG/filtering
 """
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import os, glob, csv
 import numpy as np

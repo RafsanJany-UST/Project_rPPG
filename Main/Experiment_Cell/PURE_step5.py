@@ -18,6 +18,12 @@ This version is aligned with the new modular architecture:
 - RoiExtractor implementations (central, OpenCV face, MediaPipe face regions)
 - extract_rgb_timeseries (dataset-agnostic, ROI-agnostic)
 """
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
 import matplotlib.pyplot as plt

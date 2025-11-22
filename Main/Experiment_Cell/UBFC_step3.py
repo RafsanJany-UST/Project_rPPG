@@ -10,6 +10,13 @@ We:
 - report trimming at start/end,
 - visualize a local window with raw GT vs frame-aligned GT.
 """
+import sys
+from pathlib import Path
+# Add project root (Project_rPPG) to sys.path
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 
 from pathlib import Path
 
